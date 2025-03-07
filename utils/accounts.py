@@ -18,8 +18,14 @@ class Compte:
     def __init__(self, id_compte, name, balance=DEFAULT_BALANCE, history=None):
         self.id_compte = id_compte
         self.name = name
-        self.balance = balance
-        self.history = pd.DataFrame(history, columns=HISTORY_COLUMNS) if history else pd.DataFrame(columns=HISTORY_COLUMNS)
+        self.balance = float(balance)  # Assurer que le solde est bien un float
+        
+        # Vérifier si l'historique est vide ou non
+        if history and isinstance(history, list) and history:
+            self.history = pd.DataFrame(history, columns=HISTORY_COLUMNS)
+            self.history["Amount"] = self.history["Amount"].astype(float)  # Éviter des erreurs de type
+        else:
+            self.history = pd.DataFrame(columns=HISTORY_COLUMNS)
 
     def to_dict(self):
         """Convertir l'objet Compte en dictionnaire pour JSON."""
@@ -52,7 +58,7 @@ class App_Account:
                             id_compte=compte_data["id_compte"],
                             name=compte_data["name"],
                             balance=compte_data["balance"],
-                            history=compte_data["history"],
+                            history=compte_data.get("history", []),  # Assurer une liste vide si absence d'historique
                         )
                     logger.info("Données chargées depuis le fichier JSON.")
                 except json.JSONDecodeError:
@@ -80,28 +86,24 @@ class App_Account:
     def add_money(self, name, amount):
         """Ajoute de l'argent à un compte."""
         if name in self.comptes:
-            self.comptes[name].balance += amount
-            self.comptes[name].history = pd.concat(
-                [self.comptes[name].history, pd.DataFrame([["Credit", amount]], columns=HISTORY_COLUMNS)],
-                ignore_index=True,
-            )
+            self.comptes[name].balance += float(amount)  # Conversion en float pour éviter les erreurs
+            new_entry = pd.DataFrame([["Credit", float(amount)]], columns=HISTORY_COLUMNS)
+            self.comptes[name].history = pd.concat([self.comptes[name].history, new_entry], ignore_index=True)
             self.save_to_file()
 
     def remove_money(self, name, amount):
         """Retire de l'argent d'un compte."""
-        if name in self.comptes and self.comptes[name].balance >= amount:
-            self.comptes[name].balance -= amount
-            self.comptes[name].history = pd.concat(
-                [self.comptes[name].history, pd.DataFrame([["Debit", amount]], columns=HISTORY_COLUMNS)],
-                ignore_index=True,
-            )
+        if name in self.comptes and self.comptes[name].balance >= float(amount):
+            self.comptes[name].balance -= float(amount)
+            new_entry = pd.DataFrame([["Debit", float(amount)]], columns=HISTORY_COLUMNS)
+            self.comptes[name].history = pd.concat([self.comptes[name].history, new_entry], ignore_index=True)
             self.save_to_file()
 
     def transfer_money(self, source, destination, amount):
         """Transfère de l'argent d'un compte à un autre."""
-        if source in self.comptes and destination in self.comptes and self.comptes[source].balance >= amount:
-            self.remove_money(source, amount)
-            self.add_money(destination, amount)
+        if source in self.comptes and destination in self.comptes and self.comptes[source].balance >= float(amount):
+            self.remove_money(source, float(amount))
+            self.add_money(destination, float(amount))
 
     def get_history(self, name):
         """Retourne l'historique des transactions du compte."""
@@ -118,6 +120,7 @@ class App_Account:
         if name in self.comptes:
             history = self.get_history(name)
             if history is not None and not history.empty:
+                history["Amount"] = history["Amount"].astype(float)  # S'assurer que les montants sont bien en float
                 history["Cumulative Balance"] = history.apply(
                     lambda row: row["Amount"] if row["Type"] == "Credit" else -row["Amount"], axis=1
                 ).cumsum()

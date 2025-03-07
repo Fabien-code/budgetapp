@@ -2,6 +2,6 @@ streamlit
 plotly
 pandas
 numpy
-jsonschema  # Pour la gestion des fichiers JSON (si utilisé)
+jsonschema  
 configparser
 json
