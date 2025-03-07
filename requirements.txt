@@ -97,7 +97,6 @@ rcutils==5.1.6
 referencing==0.36.2
 requests==2.32.3
 resource-retriever==3.1.2
-rich==13.9.4
 rmw-dds-common==1.6.0
 ros2action==0.18.11
 ros2bag==0.15.13
