@@ -1,3 +1,4 @@
+from datetime import datetime
 import streamlit as st
 import pandas as pd
 import utils.accounts as accounts
@@ -116,7 +117,7 @@ if accounts_list:
     st.header("📋 Historique des Transactions")
     history = finances.get_history(selected_account)
     if history is not None and not history.empty:
-        history["Date"] = pd.to_datetime(history.index).strftime("%Y-%m-%d %H:%M:%S")
+        history["Date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         st.table(history[["Type", "Amount", "Date"]])
     else:
         st.warning("Aucune transaction.")
