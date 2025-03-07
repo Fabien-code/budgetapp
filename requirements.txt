@@ -4,4 +4,3 @@ pandas
 numpy
 jsonschema  
 configparser
-json
