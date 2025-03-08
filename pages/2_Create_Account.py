@@ -25,7 +25,7 @@ def create_user(username, password):
 if st.button("Créer mon compte"):
     if new_username and new_password:
         if create_user(new_username, new_password):
-            new_account = accounts.App_account(new_username)
+            new_account = accounts.App_Account(new_username)
             st.success(f"Compte '{new_username}' créé ✅")
             st.session_state["new_user_created"] = True
             st.rerun()
