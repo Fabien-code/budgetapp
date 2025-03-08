@@ -1,25 +1,21 @@
-import json
-import os
 import streamlit as st
+import firebase_admin
+from firebase_admin import db
 
-# Charger les données existantes ou créer un fichier vide
-data_file = "data.json"
 
-if os.path.exists(data_file):
-    with open(data_file, "r") as f:
-        try:
-            account_data = json.load(f)
-        except json.JSONDecodeError:
-            account_data = {}  # Fichier vide ou corrompu
+
+# Référence à la base de données
+users_ref = db.reference("users")
 
 def verify_user(username, password):
-    print(account_data.get(username), password)
-    return account_data.get(username) == password
+    """ Vérifie si l'utilisateur existe et si le mot de passe correspond """
+    user_data = users_ref.child(username).get()
+    return user_data is not None and user_data.get("password") == password
 
 def create_user(username, password):
-    if username in account_data:
-        print("User already exists", account_data)
-        return False
+    """ Crée un nouvel utilisateur s'il n'existe pas déjà """
+    if users_ref.child(username).get():
+        return False  # L'utilisateur existe déjà
     
-    account_data[username] = password
+    users_ref.child(username).set({"password": password})
     return True

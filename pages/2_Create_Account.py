@@ -1,39 +1,36 @@
 import streamlit as st
-import utils.auth as auth
 import json
-import os
+import firebase_admin
+from firebase_admin import db
+import utils.accounts as accounts
 
 st.title("📝 Créer un compte")
 
 new_username = st.text_input("Nom d'utilisateur")
 new_password = st.text_input("Mot de passe", type="password")
 
-# Charger les données existantes ou créer un fichier vide
-data_file = "data.json"
+def get_users():
+    """Récupère tous les utilisateurs depuis Firebase."""
+    ref = db.reference("users")
+    return ref.get() or {}  # Retourne un dict vide si aucun utilisateur
 
-if os.path.exists(data_file):
-    with open(data_file, "r") as f:
-        try:
-            account_data = json.load(f)
-        except json.JSONDecodeError:
-            account_data = {}  # Fichier vide ou corrompu
-else:
-    account_data = {}
+def create_user(username, password):
+    """Ajoute un nouvel utilisateur à Firebase."""
+    users = get_users()
+    if username in users:
+        return False  # Nom déjà pris
+    db.reference(f"users/{username}").set({"password": password})
+    return True
 
 if st.button("Créer mon compte"):
-    if new_username in account_data:
-        st.error("Nom d'utilisateur déjà pris ❌")
-    elif new_username and new_password:
-        # Ajouter le nouvel utilisateur
-        account_data[new_username] = new_password
-        with open(data_file, "w") as f:
-            json.dump(account_data, f, indent=4)  # Sauvegarde du fichier JSON
-
-        st.success(f"Compte '{new_username}' créé ✅")
-
-        # Redirection après création du compte
-        st.session_state["new_user_created"] = True
-        st.rerun()
+    if new_username and new_password:
+        if create_user(new_username, new_password):
+            new_account = accounts.App_account(new_username)
+            st.success(f"Compte '{new_username}' créé ✅")
+            st.session_state["new_user_created"] = True
+            st.rerun()
+        else:
+            st.error("Nom d'utilisateur déjà pris ❌")
     else:
         st.error("Veuillez remplir tous les champs.")
 

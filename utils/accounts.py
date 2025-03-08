@@ -18,14 +18,8 @@ class Compte:
     def __init__(self, id_compte, name, balance=DEFAULT_BALANCE, history=None):
         self.id_compte = id_compte
         self.name = name
-        self.balance = float(balance)  # Assurer que le solde est bien un float
-        
-        # Vérifier si l'historique est vide ou non
-        if history and isinstance(history, list) and history:
-            self.history = pd.DataFrame(history, columns=HISTORY_COLUMNS)
-            self.history["Amount"] = self.history["Amount"].astype(float)  # Éviter des erreurs de type
-        else:
-            self.history = pd.DataFrame(columns=HISTORY_COLUMNS)
+        self.balance = float(balance)
+        self.history = pd.DataFrame(history, columns=HISTORY_COLUMNS) if history else pd.DataFrame(columns=HISTORY_COLUMNS)
 
     def to_dict(self):
         """Convertir l'objet Compte en dictionnaire pour JSON."""
@@ -33,50 +27,62 @@ class Compte:
             "id_compte": self.id_compte,
             "name": self.name,
             "balance": self.balance,
-            "history": self.history.to_dict(orient="records"),  # Convertir le DataFrame en liste de dictionnaires
+            "history": self.history.to_dict(orient="records"),
         }
 
 class App_Account:
-    def __init__(self):
+    def __init__(self, username):
+        self.username = username
         self.comptes = {}
-        self.load_from_file()  # Charger les comptes au démarrage
+        self.load_from_file()
 
     def save_to_file(self):
-        """Sauvegarde les comptes dans un fichier JSON."""
-        data = {name: compte.to_dict() for name, compte in self.comptes.items()}
-        with open(DATA_FILE, "w") as f:
-            json.dump(data, f, indent=4)
-
-    def load_from_file(self):
-        """Charge les comptes depuis un fichier JSON."""
+        """Sauvegarde uniquement les comptes de l'utilisateur connecté."""
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, "r") as f:
                 try:
                     data = json.load(f)
-                    for name, compte_data in data.items():
+                except json.JSONDecodeError:
+                    data = {}
+        else:
+            data = {}
+
+        data[self.username] = {name: compte.to_dict() for name, compte in self.comptes.items()}
+
+        with open(DATA_FILE, "w") as f:
+            json.dump(data, f, indent=4)
+
+    def load_from_file(self):
+        """Charge uniquement les comptes de l'utilisateur connecté."""
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, "r") as f:
+                try:
+                    data = json.load(f)
+                    user_data = data.get(self.username, {})  # Charger uniquement les comptes de cet utilisateur
+                    for name, compte_data in user_data.items():
                         self.comptes[name] = Compte(
                             id_compte=compte_data["id_compte"],
                             name=compte_data["name"],
                             balance=compte_data["balance"],
-                            history=compte_data.get("history", []),  # Assurer une liste vide si absence d'historique
+                            history=compte_data.get("history", []),
                         )
-                    logger.info("Données chargées depuis le fichier JSON.")
+                    logger.info(f"Données de {self.username} chargées.")
                 except json.JSONDecodeError:
                     logger.warning("Fichier JSON corrompu, création d'une nouvelle base de données.")
         else:
             logger.info("Aucun fichier JSON trouvé, création d'une nouvelle base de données.")
 
     def create_account(self, name):
-        """Crée un compte avec un solde initial."""
+        """Crée un compte uniquement pour l'utilisateur connecté."""
         if name not in self.comptes:
             self.comptes[name] = Compte(id_compte=str(np.random.randint(10000, 99999)), name=name, balance=DEFAULT_BALANCE)
             self.save_to_file()
-            logger.info(f"Compte '{name}' créé avec succès.")
+            logger.info(f"Compte '{name}' créé pour {self.username}.")
         else:
-            logger.warning(f"Le compte '{name}' existe déjà.")
+            logger.warning(f"Le compte '{name}' existe déjà pour {self.username}.")
 
     def get_all_accounts(self):
-        """Retourne la liste des comptes."""
+        """Retourne la liste des comptes de l'utilisateur connecté."""
         return list(self.comptes.keys())
 
     def get_balance(self, name):
@@ -86,7 +92,7 @@ class App_Account:
     def add_money(self, name, amount):
         """Ajoute de l'argent à un compte."""
         if name in self.comptes:
-            self.comptes[name].balance += float(amount)  # Conversion en float pour éviter les erreurs
+            self.comptes[name].balance += float(amount)
             new_entry = pd.DataFrame([["Credit", float(amount)]], columns=HISTORY_COLUMNS)
             self.comptes[name].history = pd.concat([self.comptes[name].history, new_entry], ignore_index=True)
             self.save_to_file()
@@ -100,7 +106,7 @@ class App_Account:
             self.save_to_file()
 
     def transfer_money(self, source, destination, amount):
-        """Transfère de l'argent d'un compte à un autre."""
+        """Transfère de l'argent entre deux comptes de l'utilisateur."""
         if source in self.comptes and destination in self.comptes and self.comptes[source].balance >= float(amount):
             self.remove_money(source, float(amount))
             self.add_money(destination, float(amount))
@@ -110,7 +116,7 @@ class App_Account:
         return self.comptes[name].history if name in self.comptes else None
 
     def delete_account(self, name):
-        """Supprime un compte."""
+        """Supprime un compte de l'utilisateur."""
         if name in self.comptes:
             del self.comptes[name]
             self.save_to_file()
@@ -120,7 +126,7 @@ class App_Account:
         if name in self.comptes:
             history = self.get_history(name)
             if history is not None and not history.empty:
-                history["Amount"] = history["Amount"].astype(float)  # S'assurer que les montants sont bien en float
+                history["Amount"] = history["Amount"].astype(float)
                 history["Cumulative Balance"] = history.apply(
                     lambda row: row["Amount"] if row["Type"] == "Credit" else -row["Amount"], axis=1
                 ).cumsum()
