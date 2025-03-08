@@ -1,57 +1,48 @@
 import streamlit as st
 
-# Fonction pour calculer les conseils en fonction du revenu et des objectifs
-def donner_conseils(finances):
-    revenus = finances["revenus"]
-    objectifs = finances["objectifs"]
+def calculer_temps_objectif(revenus, depenses, montant_objectif):
+    """Calcule le temps nécessaire pour atteindre l'objectif financier"""
+    montant_epargne_mensuelle = max(revenus - depenses, 0)  # Évite une épargne négative
+    if montant_epargne_mensuelle == 0:
+        return float('inf')  # Si l'utilisateur ne peut pas épargner, objectif inatteignable
+    mois_necessaires = montant_objectif / montant_epargne_mensuelle
+    return mois_necessaires
 
-    # Règle 50/30/20
-    besoins = revenus * 0.50
-    envies = revenus * 0.30
-    epargne = revenus * 0.20
+def afficher_recommandations(revenus, depenses, objectif, montant_objectif):
+    """Affiche une stratégie d'investissement pour atteindre l'objectif"""
+    mois_necessaires = calculer_temps_objectif(revenus, depenses, montant_objectif)
 
-    st.subheader("Voici vos conseils financiers basés sur la règle 50/30/20 :")
+    st.subheader(f"Stratégie pour atteindre votre objectif : {objectif}")
     
-    st.write(f"**50% pour les besoins :** {besoins} €")
-    st.write(f"**30% pour les envies :** {envies} €")
-    st.write(f"**20% pour l'épargne et le remboursement des dettes :** {epargne} €")
-    
-    st.write("\n")
+    st.write(f"Montant cible : **{montant_objectif} €**")
+    st.write(f"Épargne mensuelle possible : **{revenus - depenses} €**")
 
-    # Conseils supplémentaires en fonction des objectifs
-    if "épargne" in objectifs:
-        st.write("Conseil : Vous devriez vous concentrer sur la construction d'une épargne d'urgence avant d'augmenter vos dépenses.")
-    if "remboursement de dettes" in objectifs:
-        st.write("Conseil : Priorisez le remboursement de vos dettes, surtout celles à taux d'intérêt élevé.")
-    if "investissements" in objectifs:
-        st.write("Conseil : Une fois vos dettes sous contrôle, pensez à investir une partie de votre épargne dans des placements à long terme.")
-    
-    st.write("\n")
-    
-    st.write("N'oubliez pas que ces conseils doivent être adaptés en fonction de votre situation personnelle.")
+    if mois_necessaires == float('inf'):
+        st.error("⚠️ Vos dépenses sont trop élevées par rapport à vos revenus. Essayez de réduire vos dépenses ou d'augmenter vos revenus.")
+    else:
+        st.write(f"Temps estimé pour atteindre votre objectif : **{mois_necessaires:.1f} mois**")
 
-# Formulaire pour recueillir les informations financières de l'utilisateur
+    st.write("\n### Conseils :")
+    if mois_necessaires > 60:  # Si plus de 5 ans pour atteindre l'objectif
+        st.write("📌 Envisagez d'investir une partie de votre épargne dans des placements à rendement plus élevé pour accélérer l'atteinte de votre objectif.")
+    if revenus - depenses < 200:
+        st.write("📌 Vos marges d'épargne sont faibles. Essayez d'optimiser vos dépenses pour accélérer votre progression.")
+
 def afficher_formulaire():
-    st.title("Conseils financiers personnalisés")
+    """Affiche le formulaire de saisie pour l'utilisateur"""
+    st.title("📊 Stratégie d'investissement personnalisée")
 
-    revenus = st.number_input("Entrez vos revenus mensuels (en €)", min_value=0, value=2000)
-    depenses = st.number_input("Entrez vos dépenses mensuelles (en €)", min_value=0, value=1000)
+    revenus = st.number_input("💰 Entrez vos revenus mensuels (en €)", min_value=0, value=3000)
+    depenses = st.number_input("📉 Entrez vos dépenses mensuelles (en €)", min_value=0, value=1500)
+    
+    objectif = st.text_input("🎯 Quel est votre objectif financier ? (ex: Achat appartement, Remboursement prêt, Voyage...)")
+    montant_objectif = st.number_input("💵 Montant nécessaire pour cet objectif (en €)", min_value=0, value=20000)
 
-    objectifs = []
-    if st.checkbox("Épargner pour l'avenir"):
-        objectifs.append("épargne")
-    if st.checkbox("Rembourser des dettes"):
-        objectifs.append("remboursement de dettes")
-    if st.checkbox("Investir pour la retraite"):
-        objectifs.append("investissements")
+    if st.button("🔍 Analyser ma capacité d'investissement"):
+        if objectif and montant_objectif > 0:
+            afficher_recommandations(revenus, depenses, objectif, montant_objectif)
+        else:
+            st.error("⚠️ Veuillez renseigner un objectif et un montant valide.")
 
-    if st.button("Obtenir des conseils"):
-        finances = {
-            "revenus": revenus,
-            "depenses": depenses,
-            "objectifs": objectifs
-        }
-        donner_conseils(finances)
-
-# Afficher le formulaire
+# Exécution de l'application
 afficher_formulaire()
