@@ -14,13 +14,18 @@ st.sidebar.success("Sélectionnez une page ci-dessus.")
 
 if not firebase_admin._apps:
     # Initialisation de Firebase avec la clé privée
-    firebase_key_json = st.secrets["FIREBASE_KEY_JSON"]
+    firebase_key = st.secrets["FIREBASE_KEY"]
+    dictionnaire_destination = {}
 
-    # Convertir la chaîne JSON en dictionnaire Python
-    firebase_key = json.loads(firebase_key_json)
-    cred = credentials.Certificate(firebase_key)  # Chemin vers ta clé
+    # Parcourir chaque élément du dictionnaire source
+    for key, value in firebase_key.items():
+        # Ajouter chaque clé, valeur dans le dictionnaire destination
+        dictionnaire_destination[key] = value
+    with open("firebase_key.json", 'w') as f:
+        json.dump(dictionnaire_destination, f, indent=4)
+    cred = credentials.Certificate("firebase_key.json")  # Chemin vers ta clé
     firebase_admin.initialize_app(cred, {
         "databaseURL": "https://budgetdb-13a11-default-rtdb.europe-west1.firebasedatabase.app"  # Remplace par ton URL Firebase
     })
-
+    os.remove("firebase_key.json")
     st.balloons()
