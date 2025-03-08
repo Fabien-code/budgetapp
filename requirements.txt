@@ -5,3 +5,5 @@ numpy
 jsonschema  
 configparser
 firebase-admin
+streamlit-chat
+deepseek
