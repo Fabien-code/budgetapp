@@ -15,11 +15,14 @@ HISTORY_COLUMNS = ["Type", "Amount"]
 DATA_FILE = "accounts.json"
 
 class Compte:
-    def __init__(self, id_compte, name, balance=DEFAULT_BALANCE, history=None):
+    def __init__(self, id_compte, name, is_stocks, balance=DEFAULT_BALANCE, history=None):
         self.id_compte = id_compte
         self.name = name
         self.balance = float(balance)
         self.history = pd.DataFrame(history, columns=HISTORY_COLUMNS) if history else pd.DataFrame(columns=HISTORY_COLUMNS)
+        self.taux_interet = 0.0
+        self.action = None
+        self.is_stocks = is_stocks
 
     def to_dict(self):
         """Convertir l'objet Compte en dictionnaire pour JSON."""
@@ -28,6 +31,9 @@ class Compte:
             "name": self.name,
             "balance": self.balance,
             "history": self.history.to_dict(orient="records"),
+            "is_stocks": self.is_stocks,
+            "taux_interet": self.taux_interet,
+            "action": self.action
         }
 
 class App_Account:
@@ -35,6 +41,12 @@ class App_Account:
         self.username = username
         self.comptes = {}
         self.load_from_file()
+        self.monthly_savings = None
+        self.risk_tolerance = None
+        self.purpose = None
+        self.horizon = None
+        self.preferences = None
+        
 
     def save_to_file(self):
         """Sauvegarde uniquement les comptes de l'utilisateur connecté."""
@@ -65,6 +77,7 @@ class App_Account:
                             name=compte_data["name"],
                             balance=compte_data["balance"],
                             history=compte_data.get("history", []),
+                            is_stocks=compte_data["is_stocks"]
                         )
                     logger.info(f"Données de {self.username} chargées.")
                 except json.JSONDecodeError:
@@ -72,10 +85,10 @@ class App_Account:
         else:
             logger.info("Aucun fichier JSON trouvé, création d'une nouvelle base de données.")
 
-    def create_account(self, name):
+    def create_account(self, name, is_stocks):
         """Crée un compte uniquement pour l'utilisateur connecté."""
         if name not in self.comptes:
-            self.comptes[name] = Compte(id_compte=str(np.random.randint(10000, 99999)), name=name, balance=DEFAULT_BALANCE)
+            self.comptes[name] = Compte(id_compte=str(np.random.randint(10000, 99999)), name=name, balance=DEFAULT_BALANCE, is_stocks=is_stocks)
             self.save_to_file()
             logger.info(f"Compte '{name}' créé pour {self.username}.")
         else:
@@ -92,6 +105,7 @@ class App_Account:
     def add_money(self, name, amount):
         """Ajoute de l'argent à un compte."""
         if name in self.comptes:
+            
             self.comptes[name].balance += float(amount)
             new_entry = pd.DataFrame([["Credit", float(amount)]], columns=HISTORY_COLUMNS)
             self.comptes[name].history = pd.concat([self.comptes[name].history, new_entry], ignore_index=True)

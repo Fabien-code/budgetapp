@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 ### TODO 
 
-Ajouter le chatbot, avec l'api deepseek pour la partie investissement, lui donner acces aux données des comptes de l'user pour proposer les stratégies d'investissement etc
-Faire un visuel avec les splits et laisser l'user les choisir
+Ajouter les virements suggérés a faire par l'utilisateur pour respecter les splits
+ajt un type epargen ou compte courant 
 Faire renseigner à l'user les taux et la date d'augmentation des taux pour ces comptes
-faire en sorte de pouvoir traquer les etf/actions pour le pea etc
+faire en sorte de pouvoir traquer les etf/actions pour le pea etc => exemple temporaire page 5

@@ -1,18 +1,13 @@
 {
     "fabien": {
-        "test pea": {
-            "id_compte": "53297",
-            "name": "test pea",
+        "pea": {
+            "id_compte": "20174",
+            "name": "pea",
             "balance": 0.0,
-            "history": []
-        }
-    },
-    "cathia": {
-        "livret a ": {
-            "id_compte": "86590",
-            "name": "livret a ",
-            "balance": 0.0,
-            "history": []
+            "history": [],
+            "is_stocks": false,
+            "taux_interet": 0.0,
+            "action": null
         }
     }
 }

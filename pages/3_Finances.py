@@ -64,7 +64,12 @@ st.header("🔹 Création de compte")
 account_name = st.text_input("Nom du compte")
 if st.button("Créer un compte"):
     if account_name:
-        finances.create_account(account_name)
+        is_stocks = st.checkbox("Compte de trading")
+        if is_stocks:
+            finances.action =  st.text_input("Action")
+        else : 
+            finances.taux = st.text_input("Taux d'intérêt annuel") 
+        finances.create_account(account_name, is_stocks)
         st.success(f"Compte '{account_name}' créé avec succès!")
         st.rerun()
 

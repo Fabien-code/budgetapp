@@ -7,3 +7,6 @@ configparser
 firebase-admin
 streamlit-chat
 deepseek
+yfinance
+pandas
+matplotlib
