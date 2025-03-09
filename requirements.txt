@@ -10,3 +10,4 @@ deepseek
 yfinance
 pandas
 matplotlib
+openai
