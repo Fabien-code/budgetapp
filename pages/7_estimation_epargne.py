@@ -58,4 +58,4 @@ else:
     # Affichage du graphique avec des lignes
     st.subheader("Projection des investissements sur le temps")
     st.line_chart(projections.set_index("Mois"))
-    st.text(f"Epargne dans {duree-1} mois: {projections['Epargne'].iloc[-1]:.2f} €")
+    st.text(f"Epargne dans {duree-1} mois: {monthly_savings * (duree-1) * (epargne / 100)} €")
