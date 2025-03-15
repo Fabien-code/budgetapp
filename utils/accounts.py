@@ -46,7 +46,7 @@ class App_Account:
         self.purpose = None
         self.horizon = None
         self.preferences = None
-        
+        self.split_savings = (50, 30, 20)
 
     def save_to_file(self):
         """Sauvegarde uniquement les comptes de l'utilisateur connecté."""

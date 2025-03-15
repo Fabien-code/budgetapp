@@ -3,8 +3,103 @@
         "pea": {
             "id_compte": "20174",
             "name": "pea",
-            "balance": 0.0,
-            "history": [],
+            "balance": 40.0,
+            "history": [
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 10.0,
+                    "Date": "2025-03-14 18:17:21"
+                },
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 20.0,
+                    "Date": "2025-03-14 18:17:21"
+                },
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 30.0,
+                    "Date": "2025-03-14 18:17:21"
+                },
+                {
+                    "Type": "Debit",
+                    "Amount": 5.0,
+                    "Cumulative Balance": 25.0,
+                    "Date": "2025-03-14 18:17:21"
+                },
+                {
+                    "Type": "Debit",
+                    "Amount": 5.0,
+                    "Cumulative Balance": 20.0,
+                    "Date": "2025-03-14 18:17:21"
+                },
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 30.0,
+                    "Date": "2025-03-14 18:17:21"
+                },
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 40.0,
+                    "Date": "2025-03-14 18:17:21"
+                }
+            ],
+            "is_stocks": false,
+            "taux_interet": 0.0,
+            "action": null
+        },
+        "livret a": {
+            "id_compte": "64909",
+            "name": "livret a",
+            "balance": 25.0,
+            "history": [
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 10.0,
+                    "Date": "2025-03-14 18:17:38"
+                },
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 20.0,
+                    "Date": "2025-03-14 18:17:38"
+                },
+                {
+                    "Type": "Debit",
+                    "Amount": 5.0,
+                    "Cumulative Balance": 15.0,
+                    "Date": "2025-03-14 18:17:38"
+                },
+                {
+                    "Type": "Debit",
+                    "Amount": 5.0,
+                    "Cumulative Balance": 10.0,
+                    "Date": "2025-03-14 18:17:38"
+                },
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 20.0,
+                    "Date": "2025-03-14 18:17:38"
+                },
+                {
+                    "Type": "Credit",
+                    "Amount": 10.0,
+                    "Cumulative Balance": 30.0,
+                    "Date": "2025-03-14 18:17:38"
+                },
+                {
+                    "Type": "Debit",
+                    "Amount": 5.0,
+                    "Cumulative Balance": NaN,
+                    "Date": NaN
+                }
+            ],
             "is_stocks": false,
             "taux_interet": 0.0,
             "action": null

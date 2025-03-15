@@ -39,6 +39,8 @@ def get_investment_advice(capital, savings, risk_tolerance, purpose, horizon, pr
                 f"My purpose: {purpose}\n"
                 f"- Investment horizon: {horizon} years\n"
                 f"- Preferences: {preferences}\n\n"
+                f" Here are the different acounts I have:\n"
+                f"{finances.get_all_accounts()}"
                 "Can you provide an optimized investment strategy with a diversified portfolio? "
                 "Please include percentage allocation and explanations for each choice."
                 "At the end, provide a percentage split advicebetween my needs, savings and pleasures expenses"

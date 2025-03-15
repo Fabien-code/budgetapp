@@ -22,9 +22,13 @@ monthly_savings = st.number_input("Entrez vos revenus mensuels (€)", min_value
 
 # Entrée utilisateur pour les 3 catégories d'investissement
 epargne = st.number_input("Pourcentage investi en épargne/investissement", min_value=0, max_value=100, value=40)
+st.text("Soit : {:.2f} €".format(monthly_savings * (epargne / 100)))
 besoins = st.number_input("Pourcentage dépensé dans les besoins du quotidien", min_value=0, max_value=100, value=30)
+st.text("Soit : {:.2f} €".format(monthly_savings * (besoins / 100)))
 loisirs = st.number_input("Pourcentage dépensé dans les loisirs", min_value=0, max_value=100, value=30)
+st.text("Soit : {:.2f} €".format(monthly_savings * (loisirs / 100)))
 
+finances.split_savings = (epargne, besoins, loisirs)
 # Vérification que le total est bien égal à 100%
 total = epargne + besoins + loisirs
 
@@ -39,8 +43,8 @@ else:
     st.subheader("Répartition des Investissements")
     st.pyplot(data_pie.plot.pie(y="Pourcentage", labels=data_pie["Catégorie"], autopct='%1.1f%%', legend=False).get_figure())
 
-    duree = st.number_input("Durée de la projection en mois", min_value=1)
-    st.title(f"Projection sur {duree} mois")
+    duree = st.number_input("Durée de la projection en mois", min_value=0)+1
+    st.title(f"Projection sur {duree-1} mois")
 
     # Calcul des projections
     capital = sum(finances.get_balance(account) for account in finances.get_all_accounts())
@@ -54,3 +58,4 @@ else:
     # Affichage du graphique avec des lignes
     st.subheader("Projection des investissements sur le temps")
     st.line_chart(projections.set_index("Mois"))
+    st.text(f"Epargne dans {duree-1} mois: {projections['Epargne'].iloc[-1]:.2f} €")
